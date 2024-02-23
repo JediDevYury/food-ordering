@@ -71,4 +71,7 @@ const products = [
   },
 ];
 
+type Product = typeof products[number];
+
 export default products;
+export type { Product };
