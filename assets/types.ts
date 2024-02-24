@@ -12,8 +12,6 @@
 // export type Enums<T extends keyof Database['public']['Enums']> =
 //  Database['public']['Enums'][T];
 
-import {ImageSourcePropType} from "react-native";
-
 export type Product = {
   id: number;
   image: string;
