@@ -1,17 +1,20 @@
-import {createContext, PropsWithChildren, useCallback, useContext, useState} from "react";
+import {createContext, PropsWithChildren, useCallback, useContext, useMemo, useState} from "react";
 import {Product, CartItem} from "@/assets/types";
 import {randomUUID} from "expo-crypto";
+import {number} from "prop-types";
 
 export type TCartContext = {
   items: CartItem[];
   addItem: (product: Product, size: CartItem['size']) => void;
   updateQuantity: (itemId: string, amount: -1 | 1) => void;
+  total: number;
 };
 
 export const CartContext = createContext<TCartContext>({
   items: [],
   addItem: () => {},
   updateQuantity: () => {},
+  total: 0,
 });
 
 const CartProvider = ({children}: PropsWithChildren) => {
@@ -57,11 +60,16 @@ const CartProvider = ({children}: PropsWithChildren) => {
     setItems(updatedItems);
   }, [items]);
 
+  const total = useMemo(() => {
+    return items.reduce((sum, item) => (sum += item.product.price * item.quantity), 0);
+  }, [items]);
+
   return (
     <CartContext.Provider value={{
       items,
       addItem,
       updateQuantity,
+      total,
     }}>
       {children}
     </CartContext.Provider>
