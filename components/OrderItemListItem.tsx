@@ -1,47 +1,30 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
 import React from 'react';
 import Colors from '@/constants/Colors';
-import { CartItem } from '@/assets/types';
-import { FontAwesome } from '@expo/vector-icons';
-import { useCartContext } from '@/providers/CartProvider';
-import {defaultProductImage} from "@/constants/DefaultProfuctImage";
+import { OrderItem } from '@/assets/types';
+import {defaultProductImage} from '@/constants/DefaultProfuctImage';
 
-type CartListItemProps = {
-  cartItem: CartItem;
+type OrderItemListItemProps = {
+  item: OrderItem;
 };
 
-const CartListItem = ({ cartItem }: CartListItemProps) => {
-  const { updateQuantity } = useCartContext();
-
+const OrderItemListItem = ({ item }: OrderItemListItemProps) => {
   return (
    <View style={styles.container}>
      <Image
-      source={{ uri: cartItem.product.image || defaultProductImage }}
+      source={{ uri: item.products.image || defaultProductImage }}
       style={styles.image}
       resizeMode="contain"
      />
      <View style={{ flex: 1 }}>
-       <Text style={styles.title}>{cartItem.product.name}</Text>
+       <Text style={styles.title}>{item.products.name}</Text>
        <View style={styles.subtitleContainer}>
-         <Text style={styles.price}>${cartItem.product.price.toFixed(2)}</Text>
-         <Text>Size: {cartItem.size}</Text>
+         <Text style={styles.price}>${item.products.price.toFixed(2)}</Text>
+         <Text>Size: {item.size}</Text>
        </View>
      </View>
      <View style={styles.quantitySelector}>
-       <FontAwesome
-        onPress={() => updateQuantity(cartItem.id, -1)}
-        name="minus"
-        color="gray"
-        style={{ padding: 5 }}
-       />
-
-       <Text style={styles.quantity}>{cartItem.quantity}</Text>
-       <FontAwesome
-        onPress={() => updateQuantity(cartItem.id, 1)}
-        name="plus"
-        color="gray"
-        style={{ padding: 5 }}
-       />
+       <Text style={styles.quantity}>{item.quantity}</Text>
      </View>
    </View>
   );
@@ -87,4 +70,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CartListItem;
+export default OrderItemListItem;

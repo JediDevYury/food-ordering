@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 
 import {Text, View, StyleSheet, TextInput, Image, Alert} from 'react-native';
 import Button from "@/components/Button";
-import {defaultProductImage} from "@/components/ProductListItem";
+import {defaultProductImage} from "@/constants/DefaultProfuctImage";
 import Colors from "@/constants/Colors";
 import {Stack, useLocalSearchParams} from "expo-router";
 import * as ImagePicker from 'expo-image-picker';

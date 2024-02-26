@@ -1,7 +1,7 @@
 import {View, Text, Image, StyleSheet, Pressable} from "react-native";
 import {Link, Stack, useLocalSearchParams} from "expo-router";
 import products from "@/assets/data/products";
-import {defaultProductImage} from "@/components/ProductListItem";
+import {defaultProductImage} from "@/constants/DefaultProfuctImage";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Colors from "@/constants/Colors";
 import React from "react";

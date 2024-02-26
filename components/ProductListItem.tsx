@@ -3,8 +3,7 @@ import {Image, StyleSheet, Pressable} from "react-native";
 import Colors from "@/constants/Colors";
 import {Product} from "@/assets/types";
 import {Href, Link, useSegments} from "expo-router";
-
-export const defaultProductImage = 'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/food/default.png';
+import {defaultProductImage} from "@/constants/DefaultProfuctImage";
 
 type ProductListItemProps = {
   product: Product;

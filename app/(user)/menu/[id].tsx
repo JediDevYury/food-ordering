@@ -1,7 +1,7 @@
 import {View, Text, Image, StyleSheet, Pressable} from "react-native";
 import {Stack, useLocalSearchParams, useRouter} from "expo-router";
 import products from "@/assets/data/products";
-import {defaultProductImage} from "@/components/ProductListItem";
+import {defaultProductImage} from "@/constants/DefaultProfuctImage";
 import { useState } from "react";
 import Button from "@/components/Button";
 import { useCartContext } from "@/providers/CartProvider";

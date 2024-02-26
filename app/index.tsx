@@ -9,6 +9,9 @@ const index = () => {
      <Link href={'/(user)'} asChild>
        <Button text="User" />
      </Link>
+     <Link href={'/(auth)'} asChild>
+       <Button text="Sign In" />
+     </Link>
      <Link href={'/(admin)'} asChild>
        <Button text="Admin" />
      </Link>
