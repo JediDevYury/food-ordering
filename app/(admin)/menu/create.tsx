@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {Text, View, StyleSheet, TextInput, Image, Alert} from 'react-native';
 import Button from "@/components/Button";
@@ -6,7 +6,7 @@ import {defaultProductImage} from "@/constants/DefaultProfuctImage";
 import Colors from "@/constants/Colors";
 import {Stack, useLocalSearchParams, useRouter} from "expo-router";
 import * as ImagePicker from 'expo-image-picker';
-import {useInsertProduct} from "@/api/products";
+import {useDeleteProduct, useInsertProduct, useProduct, useUpdateProduct} from "@/api/products";
 
 const CreateProduct = () => {
   const [name, setName] = useState('');
@@ -14,13 +14,26 @@ const CreateProduct = () => {
   const [errors, setErrors] = useState('');
   const [image, setImage] = useState<string | null>(null);
 
-  const { id } = useLocalSearchParams();
+  const { id: idString } = useLocalSearchParams();
 
-  const isUpdating = !!id;
+  const id = parseFloat(typeof idString === 'string' ? idString : idString[0])
+
+  const isUpdating = !!idString;
 
   const { insertProduct } = useInsertProduct();
+  const { updateProduct } = useUpdateProduct();
+  const { deleteProduct } = useDeleteProduct();
+  const { product } = useProduct(id);
 
   const router = useRouter();
+
+  useEffect(() => {
+    if(isUpdating && product) {
+      setName(product.name);
+      setPrice(product.price.toString());
+      setImage(product.image);
+    }
+  }, [product]);
 
   const resetFields = () => {
     setName('');
@@ -61,10 +74,17 @@ const CreateProduct = () => {
       return;
     }
 
-    console.warn('Updating product: ', name, price);
-
-    // TODO: Save into database
-    resetFields();
+    updateProduct({
+      id,
+      name,
+      price: parseFloat(price),
+      image,
+    }, {
+      onSuccess: () => {
+        resetFields();
+        router.back();
+      },
+    })
   };
 
   const onCreate = () => {
@@ -81,17 +101,16 @@ const CreateProduct = () => {
         resetFields();
         router.back();
       },
-      onError: (error) => {
-        setErrors(error.message);
-      }
     });
-
-    // TODO: Save into database
-    resetFields();
   };
 
   const onDelete = () => {
-    console.warn('Deleting product...');
+    deleteProduct(id, {
+      onSuccess: () => {
+        resetFields();
+        router.replace('/(admin)');
+      },
+    });
   };
 
   const confirmDelete = () => {

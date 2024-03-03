@@ -1,12 +1,12 @@
 import {Text} from "@/components/Themed";
 import {Image, StyleSheet, Pressable} from "react-native";
 import Colors from "@/constants/Colors";
-import {Product} from "@/assets/types";
 import {Href, Link, useSegments} from "expo-router";
 import {defaultProductImage} from "@/constants/DefaultProfuctImage";
+import {Tables} from "@/assets/types";
 
 type ProductListItemProps = {
-  product: Product;
+  product: Tables<'products'>;
 }
 
 export const ProductListItem = ({ product }: ProductListItemProps) => {

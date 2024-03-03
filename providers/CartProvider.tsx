@@ -1,7 +1,17 @@
 import {createContext, PropsWithChildren, useCallback, useContext, useMemo, useState} from "react";
-import {Product, CartItem} from "@/assets/types";
+import {PizzaSize, Tables} from "@/assets/types";
 import {randomUUID} from "expo-crypto";
-import {number} from "prop-types";
+
+type Product = Tables<'products'>
+
+export type CartItem = {
+  id: string;
+  product: Tables<'products'>;
+  product_id: number;
+  size: PizzaSize;
+  quantity: number;
+};
+
 
 export type TCartContext = {
   items: CartItem[];

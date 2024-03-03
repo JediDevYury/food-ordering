@@ -71,3 +71,68 @@ export const useInsertProduct = () => {
     ...response,
   }
 };
+
+export const useUpdateProduct = () => {
+  const queryClient = useQueryClient();
+
+  const {mutate, ...response} = useMutation({
+    async mutationFn(product: any) {
+      const {data, error} = await supabase
+       .from('products')
+       .update({
+         name: product.name,
+         price: product.price,
+         image: product.image,
+       })
+       .eq('id', product.id)
+       .select()
+       .single();
+
+      if(error) throw new Error(error.message);
+
+      return data;
+    },
+    async onSuccess(_, product) {
+      await queryClient.invalidateQueries({
+        queryKey: ['products'],
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: ['product', product.id],
+      });
+    },
+  });
+
+  return {
+    updateProduct: mutate,
+    ...response,
+  }
+};
+
+
+export const useDeleteProduct = () => {
+  const queryClient = useQueryClient();
+
+  const {mutate, ...response} = useMutation({
+    async mutationFn(id: number) {
+      const {error} = await supabase
+       .from('products')
+       .delete()
+       .eq('id', id)
+
+      if(error) throw new Error(error.message);
+
+      return;
+    },
+    async onSuccess() {
+      await queryClient.invalidateQueries({
+        queryKey: ['products'],
+      });
+    },
+  });
+
+  return {
+    deleteProduct: mutate,
+    ...response,
+  }
+};
