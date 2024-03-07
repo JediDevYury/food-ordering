@@ -4,6 +4,7 @@ import Colors from "@/constants/Colors";
 import {Href, Link, useSegments} from "expo-router";
 import {defaultProductImage} from "@/constants/DefaultProfuctImage";
 import {Tables} from "@/assets/types";
+import RemoteImage from "@/components/RemoteImage";
 
 type ProductListItemProps = {
   product: Tables<'products'>;
@@ -16,9 +17,10 @@ export const ProductListItem = ({ product }: ProductListItemProps) => {
   return (
    <Link href={path} asChild>
      <Pressable style={styles.container}>
-       <Image
+       <RemoteImage
+        path={product.image}
+        fallback={defaultProductImage}
         style={styles.image}
-        source={{uri: product.image || defaultProductImage}}
         resizeMode="contain"
        />
 

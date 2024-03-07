@@ -24,23 +24,7 @@ export default function MenuStack() {
              }
            </Pressable>
          </Link>
-        ),
-        headerLeft: () => (
-         <Link href="/" asChild>
-           <Pressable>
-             {
-               () => (
-                <Ionicons
-                 name="chevron-back"
-                 color={Colors.light.tint}
-                 size={32}
-                />
-               )
-             }
-           </Pressable>
-         </Link>
-        ),
-        title: 'Menu',
+        )
       }}/>
     </Stack>
   )

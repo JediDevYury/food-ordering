@@ -1,4 +1,4 @@
-import { Text, View, FlatList, StyleSheet, Pressable } from 'react-native';
+import {Text, View, FlatList, StyleSheet, Pressable, ActivityIndicator} from 'react-native';
 import {useLocalSearchParams} from "expo-router";
 import {Stack} from "expo-router";
 import orders from "@/assets/data/orders";
@@ -6,19 +6,24 @@ import OrderListItem from "@/components/OrderListItem";
 import OrderItemListItem from "@/components/OrderItemListItem";
 import { OrderStatusList } from '@/assets/types';
 import Colors from "@/constants/Colors";
+import {useOrderDetails, useUpdateOrder} from "@/api/orders";
+import {useCallback} from "react";
 
 export default function OrderDetailsScreen () {
-  const { id } = useLocalSearchParams();
+  const { id: idString } = useLocalSearchParams();
 
-  const order = orders.find(order => order.id.toString() === id);
+  const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
 
-  if (!order) {
-    return (
-      <View>
-        <Text style={{fontSize: 20}}>Not found</Text>
-      </View>
-    )
-  }
+  const {data: order, isLoading, error} = useOrderDetails(id)
+  const {updateOrder} = useUpdateOrder()
+
+  const updateStatus = useCallback((status: string) => {
+    updateOrder({id, updatedFields: {status}})
+  }, [])
+
+  if(isLoading) return <ActivityIndicator />;
+
+  if(error || !order) return <Text>Failed to fetch order</Text>
 
   return (
    <View style={{
@@ -31,7 +36,7 @@ export default function OrderDetailsScreen () {
      }}/>
 
      <FlatList
-      data={order.order_items}
+      data={order?.order_items}
       renderItem={({item}) => <OrderItemListItem item={item}/>}
       keyExtractor={(item) => item.id.toString()}
       contentContainerStyle={styles.contentContainer}
@@ -46,7 +51,7 @@ export default function OrderDetailsScreen () {
              {OrderStatusList.map((status) => (
               <Pressable
                key={status}
-               onPress={() => console.warn('Update status')}
+               onPress={() => updateStatus(status)}
                style={{
                  borderColor: Colors.light.tint,
                  borderWidth: 1,

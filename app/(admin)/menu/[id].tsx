@@ -5,6 +5,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Colors from "@/constants/Colors";
 import React from "react";
 import {useProduct} from "@/api/products";
+import RemoteImage from "@/components/RemoteImage";
 
 const ProductDetailsScreen = () => {
   const { id: idString } = useLocalSearchParams();
@@ -15,7 +16,7 @@ const ProductDetailsScreen = () => {
 
   if(isLoading) return <ActivityIndicator />;
 
-  if(error) return <Text>Failed to fetch products</Text>
+  if(error || !product) return <Text>Failed to fetch products</Text>
 
   return (
    <View style={styles.container}>
@@ -43,9 +44,14 @@ const ProductDetailsScreen = () => {
         )
       }}/>
      <Stack.Screen options={{title: product?.name}}/>
-     <Image style={styles.image} source={{uri: product?.image || defaultProductImage}}/>
-     <Text style={styles.title}>{product.name}</Text>
-     <Text style={styles.price}>Price: ${product.price}</Text>
+     <RemoteImage
+      path={product.image}
+      fallback={defaultProductImage}
+      style={styles.image}
+      resizeMode="contain"
+     />
+     <Text style={styles.title}>{product?.name}</Text>
+     <Text style={styles.price}>Price: ${product?.price}</Text>
    </View>
   );
 };

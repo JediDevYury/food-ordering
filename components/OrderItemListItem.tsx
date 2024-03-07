@@ -1,18 +1,24 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
 import React from 'react';
 import Colors from '@/constants/Colors';
-import { OrderItem } from '@/assets/types';
 import {defaultProductImage} from '@/constants/DefaultProfuctImage';
+import { Tables } from "@/assets/types";
+import RemoteImage from "@/components/RemoteImage";
 
 type OrderItemListItemProps = {
-  item: OrderItem;
+  item: { products: Tables<'products'> | null } & Tables<'order_items'>;
 };
 
 const OrderItemListItem = ({ item }: OrderItemListItemProps) => {
+  if (!item.products) {
+    return <Text>Product not found</Text>;
+  }
+
   return (
    <View style={styles.container}>
-     <Image
-      source={{ uri: item.products.image || defaultProductImage }}
+     <RemoteImage
+      path={item.products.image}
+      fallback={defaultProductImage}
       style={styles.image}
       resizeMode="contain"
      />

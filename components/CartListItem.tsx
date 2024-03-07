@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
 import React from 'react';
 import Colors from '@/constants/Colors';
-import { CartItem } from '@/assets/types';
 import { FontAwesome } from '@expo/vector-icons';
-import { useCartContext } from '@/providers/CartProvider';
+import {CartItem, useCartContext} from '@/providers/CartProvider';
 import {defaultProductImage} from "@/constants/DefaultProfuctImage";
+import RemoteImage from "@/components/RemoteImage";
 
 type CartListItemProps = {
   cartItem: CartItem;
@@ -15,8 +15,9 @@ const CartListItem = ({ cartItem }: CartListItemProps) => {
 
   return (
    <View style={styles.container}>
-     <Image
-      source={{ uri: cartItem.product.image || defaultProductImage }}
+     <RemoteImage
+      path={cartItem.product.image}
+      fallback={defaultProductImage}
       style={styles.image}
       resizeMode="contain"
      />

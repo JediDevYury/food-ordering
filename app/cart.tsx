@@ -7,7 +7,7 @@ import CartListItem from "@/components/CartListItem";
 import Button from "@/components/Button";
 
 const CartScreen = () => {
-  const { items, total } = useCartContext();
+  const { items, total, checkout } = useCartContext();
 
   return (
    <View style={{padding: 10}}>
@@ -23,7 +23,8 @@ const CartScreen = () => {
        fontSize: 20,
        fontWeight: "500",
      }}>Total: ${total}</Text>
-     <Button text={"Checkout"} onPress={() => {}}/>
+
+     <Button text={"Checkout"} onPress={checkout}/>
      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
    </View>
   );

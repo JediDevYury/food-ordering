@@ -7,33 +7,27 @@ import Colors from "@/constants/Colors";
 import {Stack, useLocalSearchParams, useRouter} from "expo-router";
 import * as ImagePicker from 'expo-image-picker';
 import {useDeleteProduct, useInsertProduct, useProduct, useUpdateProduct} from "@/api/products";
+import {randomUUID} from "expo-crypto";
+import {supabase} from "@/lib/supabase";
+import {decode} from "base64-arraybuffer";
+import * as FileSystem from 'expo-file-system';
+import {TablesInsert} from "@/database.types";
+import RemoteImage from "@/components/RemoteImage";
 
 const CreateProduct = () => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [errors, setErrors] = useState('');
   const [image, setImage] = useState<string | null>(null);
-
   const { id: idString } = useLocalSearchParams();
-
-  const id = parseFloat(typeof idString === 'string' ? idString : idString[0])
-
+  const id = parseFloat(typeof idString === 'string' ?  idString : '');
   const isUpdating = !!idString;
-
-  const { insertProduct } = useInsertProduct();
+  const {mutate: insertProduct} = useInsertProduct();
   const { updateProduct } = useUpdateProduct();
   const { deleteProduct } = useDeleteProduct();
   const { product } = useProduct(id);
 
   const router = useRouter();
-
-  useEffect(() => {
-    if(isUpdating && product) {
-      setName(product.name);
-      setPrice(product.price.toString());
-      setImage(product.image);
-    }
-  }, [product]);
 
   const resetFields = () => {
     setName('');
@@ -69,16 +63,44 @@ const CreateProduct = () => {
     }
   };
 
-  const onUpdate = () => {
+  const uploadImage = async () => {
+    if (!image?.startsWith('file://')) {
+      return;
+    }
+
+    const base64 = await FileSystem.readAsStringAsync(image, {
+      encoding: 'base64',
+    });
+    const filePath = `${randomUUID()}.png`;
+    const contentType = 'image/png';
+    const { data, error } = await supabase.storage
+     .from('product-images')
+     .upload(filePath, decode(base64), { contentType });
+
+    if (data) {
+      return data.path;
+    }
+  };
+
+  const onUpdate = async () => {
     if(!validateInput()) {
       return;
     }
 
-    updateProduct({
-      id,
+    const newProduct: TablesInsert<'products'> = {
       name,
       price: parseFloat(price),
-      image,
+    }
+
+    const imagePath = await uploadImage()
+
+    if(imagePath) {
+      newProduct.image = imagePath;
+    }
+
+    updateProduct({
+      id,
+      ...newProduct,
     }, {
       onSuccess: () => {
         resetFields();
@@ -87,16 +109,22 @@ const CreateProduct = () => {
     })
   };
 
-  const onCreate = () => {
+  const onCreate = async () => {
     if(!validateInput()) {
       return;
     }
 
-    insertProduct({
+    const newProduct: TablesInsert<'products'> = {
       name,
       price: parseFloat(price),
-      image,
-    }, {
+    }
+    const imagePath = await uploadImage()
+
+    if(imagePath) {
+      newProduct.image = imagePath;
+    }
+
+    insertProduct(newProduct, {
       onSuccess: () => {
         resetFields();
         router.back();
@@ -135,12 +163,18 @@ const CreateProduct = () => {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
   };
+
+  useEffect(() => {
+    if(isUpdating && product) {
+      setName(product.name);
+      setPrice(product.price.toString());
+      setImage(product.image);
+    }
+  }, [product]);
 
   return (
    <View style={styles.container}>
@@ -150,10 +184,12 @@ const CreateProduct = () => {
         'Create a new product'
      }}/>
      <Image
-      style={styles.image}
       source={{
-       uri: image || defaultProductImage,
-     }}/>
+        uri: image || defaultProductImage,
+      }}
+      style={styles.image}
+      resizeMode="contain"
+     />
      <Text style={styles.textButton} onPress={pickImage}>Select an image</Text>
      <Text style={styles.label}>Name</Text>
      <TextInput
