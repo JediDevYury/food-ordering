@@ -28,7 +28,8 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: Colors.light.tint,
         }
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
