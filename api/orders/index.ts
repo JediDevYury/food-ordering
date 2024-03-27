@@ -55,6 +55,7 @@ export const useOrderDetails = (id: number) => {
        .select('*, order_items(*, products(*))')
        .eq('id', id)
        .single();
+
       if (error) {
         throw new Error(error.message);
       }

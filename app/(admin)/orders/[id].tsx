@@ -19,6 +19,8 @@ export default function OrderDetailsScreen () {
 
   const updateStatus = useCallback((status: string) => {
     updateOrder({id, updatedFields: {status}})
+
+    console.log("Notify: ", order?.user_id)
   }, [])
 
   if(isLoading) return <ActivityIndicator />;
