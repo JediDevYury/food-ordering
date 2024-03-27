@@ -2,6 +2,8 @@ import {Platform} from "react-native";
 import * as Notifications from "expo-notifications";
 import * as Device from 'expo-device';
 import Constants from "expo-constants";
+import {supabase} from "@/lib/supabase";
+import {Tables} from "@/assets/types";
 
 async function registerForPushNotificationsAsync() {
   let token;
@@ -29,20 +31,19 @@ async function registerForPushNotificationsAsync() {
     token = (await Notifications.getExpoPushTokenAsync({
       projectId: Constants.expoConfig?.extra?.eas.projectId,
     })).data;
-    console.log(token);
-  } else {
-    alert('Must use physical device for Push Notifications');
+
+    return token;
   }
 
-  return token;
+  return;
 }
 
-async function sendPushNotification(expoPushToken: string) {
+async function sendPushNotification(expoPushToken: string, order: Tables<"orders">) {
   const message = {
     to: expoPushToken,
     sound: 'default',
-    title: 'Original Title',
-    body: 'And here is the body!',
+    title: `Your order #${order.id} has been updated to ${order.status}`,
+    body: 'It should get there in 10 minutes!',
     data: { someData: 'goes here' },
   };
 
@@ -56,5 +57,29 @@ async function sendPushNotification(expoPushToken: string) {
     body: JSON.stringify(message),
   });
 }
+
+const getUserToken = async (userId: string) => {
+  const {data, error} = await supabase.from('profiles').select('*').eq('id', userId).single();
+
+  if(error) {
+    throw new Error(error.message);
+  }
+
+  return data?.user_push_token;
+};
+
+export const notifyUserAboutOrderUpdate = async (order: Tables<"orders">) => {
+  if(!order.user_id) {
+    return;
+  }
+
+  const userToken = await getUserToken(order.user_id);
+
+  if(!userToken) {
+    throw new Error('User has no push token');
+  }
+
+  await sendPushNotification(userToken, order);
+};
 
 export {registerForPushNotificationsAsync, sendPushNotification};

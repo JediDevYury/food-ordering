@@ -1,13 +1,13 @@
 import {Text, View, FlatList, StyleSheet, Pressable, ActivityIndicator} from 'react-native';
 import {useLocalSearchParams} from "expo-router";
 import {Stack} from "expo-router";
-import orders from "@/assets/data/orders";
 import OrderListItem from "@/components/OrderListItem";
 import OrderItemListItem from "@/components/OrderItemListItem";
 import { OrderStatusList } from '@/assets/types';
 import Colors from "@/constants/Colors";
 import {useOrderDetails, useUpdateOrder} from "@/api/orders";
 import {useCallback} from "react";
+import {notifyUserAboutOrderUpdate} from "@/lib/notifications";
 
 export default function OrderDetailsScreen () {
   const { id: idString } = useLocalSearchParams();
@@ -17,10 +17,14 @@ export default function OrderDetailsScreen () {
   const {data: order, isLoading, error} = useOrderDetails(id)
   const {updateOrder} = useUpdateOrder()
 
-  const updateStatus = useCallback((status: string) => {
+  const updateStatus = useCallback(async (status: string) => {
     updateOrder({id, updatedFields: {status}})
 
-    console.log("Notify: ", order?.user_id)
+    if(order) {
+      await notifyUserAboutOrderUpdate(order)
+    }
+
+    return;
   }, [])
 
   if(isLoading) return <ActivityIndicator />;
